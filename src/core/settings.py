@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+<<<<<<< HEAD
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -50,6 +51,23 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.google',
 
+=======
+    'django.contrib.auth',       
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',   
+    'django.contrib.staticfiles',
+    
+    'tailwind',
+    'theme',
+
+    'accounts',
+    
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',  
+    'allauth.socialaccount.providers.google',
+>>>>>>> aa52d45 (feat! add theme tailwind-django)
 ]
 
 MIDDLEWARE = [
@@ -146,6 +164,7 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'accounts.Profile'
 
+<<<<<<< HEAD
 LOGIN_REDIRECT_URL = '/profile/'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
@@ -153,6 +172,16 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
+=======
+# الإعدادات المحدثة لـ Allauth
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username', 'password1*', 'password2*']
+ACCOUNT_USERNAME_REQUIRED = False 
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+LOGIN_REDIRECT_URL = '/profile/'
+>>>>>>> aa52d45 (feat! add theme tailwind-django)
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -169,4 +198,10 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+TAILWIND_APP_NAME = 'theme'
+>>>>>>> aa52d45 (feat! add theme tailwind-django)
