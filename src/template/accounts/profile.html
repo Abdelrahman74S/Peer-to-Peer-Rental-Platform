@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.username }}'s Profile{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4 py-12">
+
+    <!-- Header Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8 hover:shadow-md transition">
+
+        <!-- Cover -->
+        <div class="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+
+        <div class="px-8 pb-8">
+            <div class="relative flex justify-between items-end -mt-12">
+
+                <!-- Avatar -->
+                <div class="p-1 bg-white rounded-2xl shadow-xl ring-4 ring-white">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}"
+                             loading="lazy"
+                             class="w-32 h-32 rounded-xl object-cover"
+                             alt="Avatar">
+                    {% else %}
+                        <div class="w-32 h-32 rounded-xl bg-slate-200 flex items-center justify-center">
+                            <i class="fas fa-user text-slate-400 text-4xl"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if user.pk == profile.pk %}
+                    <a href="{% url 'accounts:edit_profile' profile.pk %}"
+                       class="mb-4 bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fas fa-edit text-xs"></i> Edit Profile
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- User Info -->
+            <div class="mt-6">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-3xl font-bold text-slate-900">
+                        {{ profile.username }}
+                    </h1>
+
+                    {% if profile.is_verified %}
+                        <span class="bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <i class="fas fa-check-circle text-[10px]"></i> Verified
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p class="text-slate-500 mt-2 flex items-center gap-2 text-sm">
+                    <i class="fas fa-envelope text-slate-300"></i> {{ profile.email }}
+                    <span class="text-slate-300">•</span>
+                    <i class="fas fa-map-marker-alt text-slate-300"></i>
+                    {{ profile.location|default_if_none:"No location set" }}
+                </p>
+
+                <!-- Social -->
+                <div class="mt-4 flex gap-3">
+                    {% if profile.facebook_url %}
+                        <a href="{{ profile.facebook_url }}"
+                           target="_blank"
+                           class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-white transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    {% endif %}
+
+                    {% if profile.whatsapp_number %}
+                        <a href="https://wa.me/{{ profile.whatsapp_number }}"
+                           target="_blank"
+                           class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-emerald-600 hover:text-white transition">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Sidebar -->
+        <div class="space-y-8">
+
+            <!-- Stats -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">
+                    Rental Activity
+                </h3>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-xl text-center">
+                        <span class="block text-2xl font-bold text-indigo-600">
+                            {{ items_listed_count }}
+                        </span>
+                        <span class="text-xs text-slate-500 uppercase font-semibold">
+                            Listed
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl text-center">
+                        <span class="block text-2xl font-bold text-purple-600">
+                            {{ items_rented_count }}
+                        </span>
+                        <span class="text-xs text-slate-500 uppercase font-semibold">
+                            Rented
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-slate-100 text-center">
+                    <div class="flex justify-center items-center gap-1 text-amber-400 mb-1">
+                        <i class="fas fa-star"></i>
+                        <span class="text-xl font-bold text-slate-900">
+                            {{ profile.rating }}
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-slate-400 uppercase font-semibold">
+                        Based on {{ reviews_count }} reviews
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bio -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">
+                    About Me
+                </h3>
+
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    {{ profile.bio|default:"This user hasn't written a bio yet." }}
+                </p>
+            </div>
+        </div>
+
+
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 min-h-[400px]">
+
+                <!-- Tabs -->
+                <div class="border-b border-slate-100 px-6 py-4">
+                    <nav class="flex gap-8 text-sm font-semibold">
+
+                        <a href="?tab=listings"
+                           class="pb-4
+                           {% if request.GET.tab != 'reviews' %}
+                               text-indigo-600 border-b-2 border-indigo-600
+                           {% else %}
+                               text-slate-400 hover:text-slate-600
+                           {% endif %}">
+                            Listings
+                        </a>
+
+                        <a href="?tab=reviews"
+                           class="pb-4
+                           {% if request.GET.tab == 'reviews' %}
+                               text-indigo-600 border-b-2 border-indigo-600
+                           {% else %}
+                               text-slate-400 hover:text-slate-600
+                           {% endif %}">
+                            Reviews
+                        </a>
+
+                    </nav>
+                </div>
+
+                <!-- Content Area -->
+                <div class="p-12 text-center">
+
+                    {% if request.GET.tab == "reviews" %}
+
+                        <h4 class="text-slate-900 font-bold text-lg">
+                            No reviews yet
+                        </h4>
+
+                        <p class="text-slate-500 text-sm mt-2">
+                            Reviews will appear here.
+                        </p>
+
+                    {% else %}
+
+                        <h4 class="text-slate-900 font-bold text-lg">
+                            Nothing listed yet
+                        </h4>
+
+                        <p class="text-slate-500 text-sm mt-2">
+                            {% if user.pk == profile.pk %}
+                                Start by listing your first item.
+                            {% else %}
+                                This user hasn't listed anything yet.
+                            {% endif %}
+                        </p>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

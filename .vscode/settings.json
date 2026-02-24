@@ -10,5 +10,9 @@
             "username": "django_user",
             "database": "PPRP"
         }
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/.venv/Lib/site-packages"
     ]
 }

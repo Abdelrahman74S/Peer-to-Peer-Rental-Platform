@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.contrib import messages 
 from .models import Profile
 from .form import CustomUserCreationForm, ProfileForm
@@ -8,7 +8,7 @@ from django.views.generic import DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 
-# Create your views here.
+
 class RegisterView(CreateView):
     model = Profile
     form_class = CustomUserCreationForm
@@ -36,7 +36,6 @@ class UserLoginView(LoginView):
 
 class UserLogoutView(LogoutView):
     next_page = 'accounts:login'
-    
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             messages.info(request, "You have been logged out.")
@@ -46,6 +45,8 @@ class ProfileView(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'accounts/profile.html'
     context_object_name = 'profile'
+    
+    
 class EditProfileView(LoginRequiredMixin, UpdateView):
     model = Profile
     form_class = ProfileForm

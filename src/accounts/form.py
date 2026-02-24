@@ -14,12 +14,17 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = (
-            'email', 'username', 'phone_number', 'location', 'avatar', 
-            'date_birth', 'bio', 'facebook_url', 'whatsapp_number', 
-            'preferred_language', 'rating', 'reviews_count', 
-            'items_rented_count', 'items_listed_count'
-        )
-        
+        'email',
+        'username',
+        'phone_number',
+        'location',
+        'avatar',
+        'date_birth',
+        'bio',
+        'facebook_url',
+        'whatsapp_number',
+        'preferred_language',
+)
         input_classes = 'w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition duration-200 bg-white'
         
         readonly_classes = 'w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed'

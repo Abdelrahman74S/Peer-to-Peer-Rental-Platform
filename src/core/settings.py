@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from pathlib import Path
+import platform
+
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,39 +38,25 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-<<<<<<< HEAD
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'accounts',
-    
-    'django.contrib.auth',
-    'django.contrib.messages',
-    'allauth',
-    'allauth.account',
-    
-    'allauth.socialaccount.providers.facebook',
-    'allauth.socialaccount.providers.google',
-
-=======
     'django.contrib.auth',       
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',   
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     
     'tailwind',
     'theme',
 
     'accounts',
+    'items',
     
     'allauth',
     'allauth.account',
     'allauth.socialaccount',  
     'allauth.socialaccount.providers.google',
->>>>>>> aa52d45 (feat! add theme tailwind-django)
+    
+    'mapwidgets',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +75,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR /  'template'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,12 +103,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'PPRP',
         'USER': 'django_user',
         'PASSWORD': 'Abdo99#',
-        'HOST': 'localhost',  # Or the host IP/name if remote
-        'PORT': '5432',      # Default PostgreSQL port
+        'HOST': 'localhost',  
+        'PORT': '5432',    
     }
 }
 
@@ -164,16 +153,6 @@ STATIC_URL = 'static/'
 
 AUTH_USER_MODEL = 'accounts.Profile'
 
-<<<<<<< HEAD
-LOGIN_REDIRECT_URL = '/profile/'
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
-
-=======
-# الإعدادات المحدثة لـ Allauth
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_EMAIL_REQUIRED = True
@@ -181,7 +160,6 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username', 'password1*', 'password2*']
 ACCOUNT_USERNAME_REQUIRED = False 
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 LOGIN_REDIRECT_URL = '/profile/'
->>>>>>> aa52d45 (feat! add theme tailwind-django)
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -198,10 +176,31 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         }
     }
-<<<<<<< HEAD
-}
-=======
 }
 
 TAILWIND_APP_NAME = 'theme'
->>>>>>> aa52d45 (feat! add theme tailwind-django)
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+if platform.system() == "Windows":
+    VENV_BASE = Path(__file__).resolve().parent.parent.parent / ".venv"
+    OSGEO_DIR = VENV_BASE / "Lib" / "site-packages" / "osgeo"
+
+    if OSGEO_DIR.exists():
+        os.add_dll_directory(str(OSGEO_DIR))
+        
+        GDAL_LIBRARY_PATH = str(OSGEO_DIR / "gdal.dll")
+        GEOS_LIBRARY_PATH = str(OSGEO_DIR / "geos_c.dll")
+        
+        os.environ["PATH"] = str(OSGEO_DIR) + os.pathsep + os.environ["PATH"]
+        
+
+MAP_WIDGETS = {
+    "GooglePointFieldWidget": {
+        "zoom": 10,
+        "mapCenterLocation": [30.0444, 31.2357], 
+    },
+    "GOOGLE_MAPS_API_KEY": os.environ.get('GOOGLE_MAPS_KEY'),
+}

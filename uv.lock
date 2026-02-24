@@ -207,6 +207,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-map-widgets"
+version = "0.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/78/50/651dae7335fc9c6df7b1ab27c49b1cc98245ac0d61750538a192da19e671/django_map_widgets-0.5.1.tar.gz", hash = "sha256:68e81f9c58c1cd6d180421220a4d100a185c8062ae0ca7be790658fcfd4eda1d", size = 160819, upload-time = "2024-07-09T17:37:50.717Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6e/75/7f1782c9fa3c07c2ca63ce7b65c4838afb568a5ea71aa119aaa9dc456d8b/django_map_widgets-0.5.1-py3-none-any.whl", hash = "sha256:7307935163b46c6a2a225c85c91c7262a8b47a5c3aefbbc6d8fc7a5fda53b7cd", size = 256008, upload-time = "2024-07-09T17:37:48.941Z" },
+]
+
+[[package]]
 name = "dotenv"
 version = "0.9.9"
 source = { registry = "https://pypi.org/simple" }
@@ -300,6 +309,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "django" },
     { name = "django-allauth", extra = ["socialaccount"] },
+    { name = "django-map-widgets" },
     { name = "dotenv" },
     { name = "pillow" },
     { name = "psycopg2" },
@@ -314,6 +324,7 @@ dev = [
 requires-dist = [
     { name = "django", specifier = ">=6.0.2" },
     { name = "django-allauth", extras = ["socialaccount"], specifier = ">=65.14.3" },
+    { name = "django-map-widgets", specifier = ">=0.5.1" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "pillow", specifier = ">=12.1.1" },
     { name = "psycopg2", specifier = ">=2.9.11" },

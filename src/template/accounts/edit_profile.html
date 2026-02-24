@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - {{ profile.username }}{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-12">
+<div class="mb-8">
+<a href="{% url 'accounts:profile' profile.pk %}" class="text-sm font-medium text-slate-500 hover:text-indigo-600 transition flex items-center gap-2">
+<i class="fas fa-arrow-left text-[10px]"></i> Back to profile
+</a>
+<h1 class="text-3xl font-bold text-slate-900 mt-4">Account Settings</h1>
+<p class="text-slate-500 text-sm">Update your public profile and account preferences.</p>
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="space-y-8">
+    {% csrf_token %}
+    
+    <!-- Public Profile Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Public Profile</h3>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Avatar</label>
+                <div class="flex items-center gap-6">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" class="w-20 h-20 rounded-xl object-cover ring-4 ring-slate-50" alt="Current Avatar">
+                    {% endif %}
+                    <div class="grow">
+                        {{ form.avatar }}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}<p class="text-xs text-red-500 mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.location.label }}</label>
+                {{ form.location }}
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.bio.label }}</label>
+                {{ form.bio }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact & Social Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Contact & Social</h3>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.email.label }}</label>
+                {{ form.email }}
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.phone_number.label }}</label>
+                {{ form.phone_number }}
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.whatsapp_number.label }}</label>
+                {{ form.whatsapp_number }}
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.facebook_url.label }}</label>
+                {{ form.facebook_url }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Preferences Section -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Preferences</h3>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.date_birth.label }}</label>
+                {{ form.date_birth }}
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">{{ form.preferred_language.label }}</label>
+                {{ form.preferred_language }}
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end gap-4">
+        <a href="{% url 'accounts:profile' profile.pk %}" class="px-6 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancel</a>
+        <button type="submit" class="px-10 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 shadow-md shadow-indigo-100 transition-all duration-200">Save Changes</button>
+    </div>
+</form>
+
+
+</div>
+{% endblock %}

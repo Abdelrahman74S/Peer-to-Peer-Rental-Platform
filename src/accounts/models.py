@@ -13,7 +13,7 @@ egypt_phone_validator = RegexValidator(
 class Profile(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=200, blank=True)
+    username = models.CharField(max_length=200, unique=True)
     location = models.CharField(max_length=200, blank=True)
     avatar = models.ImageField(null=True, default="avatar.svg")
     bio = models.TextField(blank=True)
