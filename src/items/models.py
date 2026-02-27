@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.urls import reverse
 from django.contrib.gis.geos import Point
-
+import uuid
 # Create your models here.
 
 EGYPT_CITIES = {
@@ -55,7 +55,7 @@ class Item(models.Model):
     description = models.TextField()
     price_per_day = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    slug = models.SlugField(unique=True,allow_unicode=True)
+    slug = models.SlugField(unique=True,allow_unicode=True,default=uuid.uuid4)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='items', on_delete=models.CASCADE)
     
     is_available = models.BooleanField(default=True)
@@ -80,6 +80,10 @@ class Item(models.Model):
     class Meta:
         ordering = ['-created_at']
         
+    @property
+    def primary_image(self):
+        return self.images.filter(is_primary=True).first() or self.images.first()
+        
     def save(self, *args, **kwargs):
         if self.city and not self.location:
             city_data = EGYPT_CITIES.get(self.city)
@@ -88,7 +92,10 @@ class Item(models.Model):
                 self.location = Point(lng, lat, srid=4326)
         
         if not self.slug:
-            self.slug = slugify(self.title,allow_unicode=True)
+            base_slug = slugify(self.title, allow_unicode=True)
+            unique_id = str(uuid.uuid4())[:8]
+            self.slug = f"{base_slug}-{unique_id}"
+            
         super(Item, self).save(*args, **kwargs)
         
     def get_absolute_url(self):

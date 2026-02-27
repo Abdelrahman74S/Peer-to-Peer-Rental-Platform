@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        
+        <!-- Warning Card -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-linear-to-r from-red-500 to-red-600 px-6 py-8 text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-white bg-opacity-20 mb-4">
+                    <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-white">
+                    Delete Category
+                </h2>
+                <p class="mt-2 text-red-100">
+                    This action cannot be undone
+                </p>
+            </div>
+
+            <!-- Content -->
+            <div class="px-6 py-8">
+                <!-- Category Info -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
+                        Category to Delete
+                    </h3>
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-linear-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                            {{ category.name|first|upper }}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-lg font-semibold text-gray-900">{{ category.name }}</p>
+                            <p class="text-sm text-gray-500">Slug: {{ category.slug }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Message -->
+                <div class="rounded-md bg-yellow-50 p-4 mb-6 border border-yellow-200">
+                    <div class="flex">
+                        <div class="shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">
+                                Warning
+                            </h3>
+                            <div class="mt-2 text-sm text-yellow-700">
+                                <p>
+                                    Are you sure you want to delete <strong>"{{ category.name }}"</strong>? 
+                                    All associated items ({{ category.items.count }}) will also be permanently removed.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Preview -->
+                {% if category.items.exists %}
+                <div class="mb-6">
+                    <h4 class="text-sm font-medium text-gray-700 mb-3">
+                        Items that will be deleted ({{ category.items.count }}):
+                    </h4>
+                    <div class="max-h-32 overflow-y-auto bg-gray-50 rounded-lg border border-gray-200 p-3">
+                        <ul class="space-y-2">
+                            {% for item in category.items.all|slice:":5" %}
+                            <li class="flex items-center text-sm text-gray-600">
+                                <svg class="mr-2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                {{ item.title }}
+                            </li>
+                            {% endfor %}
+                            {% if category.items.count > 5 %}
+                            <li class="text-sm text-gray-500 italic">
+                                and {{ category.items.count|add:"-5" }} more...
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Form -->
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    <!-- Confirmation Input -->
+                    <div>
+                        <label for="confirm" class="block text-sm font-medium text-gray-700 mb-2">
+                            Type <span class="font-mono bg-gray-100 px-1 rounded">{{ category.slug }}</span> to confirm
+                        </label>
+                        <input 
+                            type="text" 
+                            id="confirm" 
+                            name="confirm"
+                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200"
+                            placeholder="Type the slug to confirm"
+                            required
+                            pattern="{{ category.slug }}"
+                            oninvalid="this.setCustomValidity('Please type the exact slug to confirm deletion')"
+                            oninput="this.setCustomValidity('')"
+                        >
+                        <p class="mt-1 text-xs text-gray-500">
+                            This helps prevent accidental deletions
+                        </p>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                        <a href="{% url 'category_detail' category.slug %}" 
+                           class="flex-1 inline-flex justify-center items-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Cancel
+                        </a>
+                        <button type="submit" 
+                                class="flex-1 inline-flex justify-center items-center px-4 py-3 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 transform hover:scale-[1.02]">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Yes, Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Alternative Actions -->
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600">
+                Not sure? 
+                <a href="{% url 'category_update' category.slug %}" class="font-medium text-indigo-600 hover:text-indigo-500">
+                    Edit category instead
+                </a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

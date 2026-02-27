@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',  
     'allauth.socialaccount.providers.google',
     
-    'mapwidgets',
+    'leaflet',
 ]
 
 MIDDLEWARE = [
@@ -150,6 +150,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles' 
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 AUTH_USER_MODEL = 'accounts.Profile'
 
@@ -195,12 +200,34 @@ if platform.system() == "Windows":
         GEOS_LIBRARY_PATH = str(OSGEO_DIR / "geos_c.dll")
         
         os.environ["PATH"] = str(OSGEO_DIR) + os.pathsep + os.environ["PATH"]
-        
 
-MAP_WIDGETS = {
-    "GooglePointFieldWidget": {
-        "zoom": 10,
-        "mapCenterLocation": [30.0444, 31.2357], 
-    },
-    "GOOGLE_MAPS_API_KEY": os.environ.get('GOOGLE_MAPS_KEY'),
+
+# MAP_WIDGETS = {
+#     "GoogleStaticMapWidget": {
+#         "zoom": 15,
+#         "size": "480x480",
+#     },
+#     "GoogleMapPointWidget": {
+#         "settings": {
+#             "apiKey": os.environ.get('GOOGLE_MAPS_API'),
+#             "defaultCenter": [30.0444, 31.2357], 
+#         }
+#     }
+# }
+
+LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (30.0444, 31.2357),  # Cairo
+    'DEFAULT_ZOOM': 12,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'WIDGET_ADAPTED_HEIGHT': '400px', 
+    'WIDGET_ADAPTED_WIDTH': '100%',
+    'DEFAULT_PRECISION': 6,
+    'ATTRIBUTION_PREFIX': 'Powered by Leaflet',
+    'TILES': [
+        ('OpenStreetMap', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            'maxZoom': 19,
+            'attribution': '&copy; OpenStreetMap contributors'
+        }),
+    ],
 }

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Delete "{{ item.title }}"?</h2>
+        <p class="text-gray-600 mb-6">This action cannot be undone.</p>
+        
+        <form method="post" action="{% url 'item_delete' item.slug %}">
+            {% csrf_token %}
+            <div class="flex gap-4">
+                <a href="{{ item.get_absolute_url }}" class="flex-1 py-2 px-4 border border-gray-300 rounded-lg text-center hover:bg-gray-50">Cancel</a>
+                <button type="submit" class="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

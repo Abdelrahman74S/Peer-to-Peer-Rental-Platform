@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="flex items-center space-x-4">
+                    <li>
+                        <a href="{% url 'item_list' %}" class="text-gray-500 hover:text-gray-700">Items</a>
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="ml-4 text-gray-900 font-medium">{{ item.title }}</span>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="lg:grid lg:grid-cols-2 lg:gap-x-12 lg:items-start">
+            
+            <!-- Image Gallery -->
+            <div class="flex flex-col">
+                <!-- Main Image — FIX 1: replaced aspect-w-4/aspect-h-3 with native aspect-[4/3] -->
+                <div class="w-full aspect-[4/3] bg-gray-200 rounded-2xl overflow-hidden shadow-lg mb-4">
+                    {% if item.primary_image %}
+                    <img id="main-image" src="{{ item.primary_image.image.url }}" alt="{{ item.title }}" 
+                         class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-500 cursor-zoom-in">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                        <svg class="h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Thumbnail Gallery — FIX 2: replaced aspect-w-1/aspect-h-1 with native aspect-square -->
+                {% if item.images.count > 1 %}
+                <div class="grid grid-cols-4 gap-4">
+                    {% for image in item.images.all %}
+                    <button onclick="document.getElementById('main-image').src='{{ image.image.url }}'"
+                            class="relative aspect-square rounded-lg overflow-hidden {% if image.is_primary %}ring-2 ring-indigo-500{% endif %} hover:opacity-75 transition-opacity">
+                        <img src="{{ image.image.url }}" alt="{{ item.title }}" class="w-full h-full object-cover">
+                    </button>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Product Info -->
+            <div class="mt-10 px-4 sm:px-0 sm:mt-16 lg:mt-0">
+                <!-- Category -->
+                <div class="mb-4">
+                    <a href="{{ item.category.get_absolute_url }}" 
+                       class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 hover:bg-indigo-200 transition-colors">
+                        {{ item.category.name }}
+                    </a>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl mb-4">
+                    {{ item.title }}
+                </h1>
+
+                <!-- Price -->
+                <div class="mt-3 flex items-end">
+                    <p class="text-4xl font-bold text-gray-900">${{ item.price_per_day }}</p>
+                    <span class="ml-2 text-lg text-gray-500 mb-1">/ day</span>
+                </div>
+
+                <!-- Availability Badge -->
+                <div class="mt-4">
+                    {% if item.is_available %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                        Available Now
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                        <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                        Currently Unavailable
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Description -->
+                <div class="mt-8">
+                    <h3 class="text-lg font-medium text-gray-900">Description</h3>
+                    <!-- FIX 3: removed wrapping <p> tag; linebreaks filter already emits <p> tags -->
+                    <!-- FIX 4: changed prose-indigo to prose (prose-indigo is not a standard Tailwind class) -->
+                    <div class="mt-4 prose text-gray-600">
+                        {{ item.description|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="mt-8 border-t border-gray-200 pt-8">
+                    <h3 class="text-lg font-medium text-gray-900">Location</h3>
+                    <div class="mt-4 flex items-center text-gray-600">
+                        <svg class="h-6 w-6 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="text-lg">{{ item.get_city_display }}</span>
+                    </div>
+                    
+                    <!-- Map Container — FIX 5: added relative positioning so Leaflet controls render correctly -->
+                    {% if item.location %}
+                    <div id="map" style="height: 300px; width: 100%;" class="relative mt-4 rounded-lg border border-gray-300 z-0"></div>
+                    {% endif %}
+                </div>
+
+                <!-- Owner Info -->
+                <div class="mt-8 border-t border-gray-200 pt-8">
+                    <h3 class="text-lg font-medium text-gray-900">Owner</h3>
+                    <div class="mt-4 flex items-center">
+                        <div class="h-12 w-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                            {{ item.owner.username|first|upper }}
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-900">{{ item.owner.username }}</p>
+                            <p class="text-sm text-gray-500">Member since {{ item.owner.date_joined|date:"F Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                    {% if user == item.owner or user.is_staff %}
+                    <a href="{% url 'item_update' item.slug %}" 
+                       class="flex-1 bg-indigo-600 border border-transparent rounded-lg py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit Item
+                    </a>
+                    <a href="{% url 'item_delete' item.slug %}" 
+                       class="flex-1 bg-red-600 border border-transparent rounded-lg py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete
+                    </a>
+                    {% else %}
+                    <button type="button" 
+                            class="flex-1 bg-indigo-600 border border-transparent rounded-lg py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Request to Rent
+                    </button>
+                    <button type="button" 
+                            class="flex-1 bg-white border-2 border-gray-300 rounded-lg py-3 px-8 flex items-center justify-center text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        Contact Owner
+                    </button>
+                    {% endif %}
+                </div>
+
+                <!-- Meta Info -->
+                <div class="mt-8 border-t border-gray-200 pt-8 text-sm text-gray-500">
+                    <p>Posted on {{ item.created_at|date:"F d, Y" }}</p>
+                    <p class="mt-1">Last updated {{ item.updated_at|date:"F d, Y" }}</p>
+                    <p class="mt-1">Item ID: {{ item.slug }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+{% if item.location %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var lat = parseFloat('{{ item.location.y|default:"0" }}');
+        var lng = parseFloat('{{ item.location.x|default:"0" }}');
+        
+        console.log('Map coordinates:', lat, lng);
+        
+        if (lat && lng && lat !== 0 && lng !== 0) {
+            var mapContainer = document.getElementById('map');
+            
+            if (mapContainer) {
+                console.log('Map container found, initializing...');
+                
+                var map = L.map('map').setView([lat, lng], 13);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup('{{ item.title|escapejs }}')
+                    .openPopup();
+                
+                setTimeout(function() {
+                    map.invalidateSize();
+                    console.log('Map size invalidated');
+                }, 100);
+            } else {
+                console.error('Map container not found');
+            }
+        } else {
+            console.error('Invalid coordinates:', lat, lng);
+        }
+    });
+</script>
+{% endif %}
+{% endblock extra_js %}

@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .leaflet-container-default { 
+        height: 400px !important; 
+        width: 100% !important;
+        border-radius: 0.75rem;
+        z-index: 1;
+    }
+</style>
+
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        
+        <div class="md:flex md:items-center md:justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">
+                    {{ form_title|default:"Create Item" }}
+                </h2>
+                <p class="mt-2 text-gray-600">
+                    Fill in the details below to {{ action|default:"list your item" }}
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{% url 'item_list' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Items
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <form method="post" enctype="multipart/form-data" action="{{ request.path }}" class="divide-y divide-gray-200">
+                {% csrf_token %}
+                
+                {{ form.media }}
+
+                <div class="px-8 py-6">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center mb-6">
+                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 mr-3 text-sm font-bold">1</span>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Item Title <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" 
+                                       name="{{ form.title.name }}" 
+                                       id="{{ form.title.id_for_label }}"
+                                       value="{{ form.title.value|default:'' }}"
+                                       class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                                       placeholder="Enter a descriptive title"
+                                       required>
+                            </div>
+                            {% if form.title.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Category <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select name="{{ form.category.name }}" 
+                                        id="{{ form.category.id_for_label }}"
+                                        class="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg"
+                                        required>
+                                    <option value="">Select a category</option>
+                                    {% for choice in form.category.field.choices %}
+                                        {% if choice.0 %}
+                                        <option value="{{ choice.0 }}" {% if form.category.value == choice.0 %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if form.category.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.category.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="{{ form.price_per_day.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Price per Day ($) <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm">$</span>
+                                </div>
+                                <input type="number" 
+                                       name="{{ form.price_per_day.name }}" 
+                                       id="{{ form.price_per_day.id_for_label }}"
+                                       value="{{ form.price_per_day.value|default:'' }}"
+                                       step="1.0"
+                                       min="0"
+                                       class="block w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+                                       placeholder="0.00"
+                                       required>
+                            </div>
+                            {% if form.price_per_day.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.price_per_day.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Description <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="{{ form.description.name }}" 
+                                      id="{{ form.description.id_for_label }}"
+                                      rows="4"
+                                      class="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200 resize-none"
+                                      placeholder="Describe your item in detail..."
+                                      required>{{ form.description.value|default:'' }}</textarea>
+                            <p class="mt-1 text-xs text-gray-500">Min. 50 characters recommended</p>
+                            {% if form.description.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-8 py-6 bg-gray-50">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center mb-6">
+                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 mr-3 text-sm font-bold">2</span>
+                        Location
+                    </h3>
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                City <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
+                                <select name="{{ form.city.name }}" 
+                                        id="{{ form.city.id_for_label }}"
+                                        class="block w-full pl-10 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white"
+                                        required>
+                                    <option value="">Select city</option>
+                                    {% for choice in form.city.field.choices %}
+                                        {% if choice.0 %}
+                                        <option value="{{ choice.0 }}" {% if form.city.value == choice.0 %}selected{% endif %}>
+                                            {{ choice.1 }}
+                                        </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Precise Location (Optional)
+                            </label>
+                            <div class="bg-white rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+                                {{ form.location }}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Click on the map to set exact location or drag the marker</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-8 py-6">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center mb-6">
+                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 mr-3 text-sm font-bold">3</span>
+                        Images
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Upload Images</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-500 transition-colors duration-200 bg-gray-50">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="flex text-sm text-gray-600 justify-center">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                            <span>Upload files</span>
+                                            <input id="file-upload" name="images" type="file" multiple accept="image/*" class="sr-only">
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">PNG, JPG up to 10MB each</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if item and item.images.exists %}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Current Images</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {% for image in item.images.all %}
+                                <div class="relative group">
+                                    <img src="{{ image.image.url }}" class="h-24 w-full object-cover rounded-lg">
+                                    {% if image.is_primary %}
+                                    <span class="absolute top-1 left-1 bg-indigo-600 text-white text-xs px-2 py-1 rounded">Primary</span>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="px-8 py-6 bg-gray-50">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center mb-6">
+                        <span class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 mr-3 text-sm font-bold">4</span>
+                        Availability
+                    </h3>
+                    <div class="flex items-center">
+                        <input type="checkbox" 
+                               name="{{ form.is_available.name }}" 
+                               id="{{ form.is_available.id_for_label }}"
+                               {% if form.is_available.value %}checked{% endif %}
+                               class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded transition-colors duration-200">
+                        <label for="{{ form.is_available.id_for_label }}" class="ml-3 block text-sm font-medium text-gray-700">
+                            Item is available for rent immediately
+                        </label>
+                    </div>
+                </div>
+
+                <div class="px-8 py-6 flex items-center justify-between bg-white focus">
+                    <button type="button" 
+                            onclick="window.history.back()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+                        <svg class="-ml-1 mr-2 h-4 w-4 text-gray-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-3 rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transform hover:scale-105 transition-all duration-200 flex items-center">
+                        <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Publish Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
